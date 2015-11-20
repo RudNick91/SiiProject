@@ -14,6 +14,8 @@ public class musicService {
 			if(oneSound.contains(":")){
 				String[] splitedSound = musicNote.split(":");
 				musicForFront.add(new SoundDTO(id,splitedSound[0],splitedSound[1]));
+			}else{
+				musicForFront.add(new SoundDTO(id,"takt","takt"));
 			}
 		}
 		
@@ -22,18 +24,26 @@ public class musicService {
 	
 	public static String getApproximatedTime(String time){
 		Float timeFloat= Float.valueOf(time);
-		if(timeFloat<2500){
-			time = "0";
-		}else
-		if(timeFloat<5000){
+		if(timeFloat<125){
 			time = "1";
 		}else
-		if(timeFloat<10000){
+		if(timeFloat<250){
 			time = "2";
 		}else
-		if(timeFloat<15000){
-			time = "3";
+		if(timeFloat<500){
+			time = "4";
+		}else
+		if(timeFloat<1000){
+			time = "8";
+		}else{
+			time = "16";
 		}
+	
 		return time;
+	}
+	
+	public static String saveWav(String message){
+
+		return null;
 	}
 }

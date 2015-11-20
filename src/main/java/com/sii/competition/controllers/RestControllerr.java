@@ -1,6 +1,7 @@
 package com.sii.competition.controllers;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,17 +25,46 @@ import com.sii.competition.service.musicService;
 	TrackRepository trackRepository;
 	
 	@RequestMapping(value = "/sendSound")
-	public String sendSound(@RequestBody SoundDTO message) throws Exception {
+	public String sendSound(SoundDTO message) throws Exception {
 		TrackEntity music = trackRepository.getOne(Long.valueOf(message.getId()));
 		String musicNote = music.getMusic();
-		musicNote = musicNote + ","+message.getLine()+":"+musicService.getApproximatedTime(message.getTime());
+		String[] tact = musicNote.split("\\|");
+		String lastTact = "";
+		if(tact.length>0){
+			lastTact = tact[tact.length-1];
+			if(lastTact.indexOf(",")==0){
+				lastTact=lastTact.substring(1, lastTact.length());
+			}
+			
+		}
+
+		if(musicNote.equals("")){
+			musicNote = message.getLine()+":"+musicService.getApproximatedTime(message.getTime());
+		}else{
+			int ile=0;
+			if(tact.length>0)
+			for(String x : lastTact.split(",")){
+				ile = ile + Integer.valueOf(x.split(":")[1]);
+			}
+			String time = musicService.getApproximatedTime(message.getTime());
+			if(ile+Integer.valueOf(musicService.getApproximatedTime(message.getTime()))>16){
+				if(16-ile!=0){
+					musicNote = musicNote + ","+message.getLine()+":"+String.valueOf(16-ile);
+					time=String.valueOf(Integer.valueOf(musicService.getApproximatedTime(message.getTime()))-(16-ile));
+				}
+				musicNote = musicNote + ",|";
+			}
+			
+			musicNote = musicNote + ","+message.getLine()+":"+time;
+		}
+		
 		music.setMusic(musicNote);
 		List<SoundDTO> musicForFront= musicService.getMusicForFront(musicNote,message.getId());
-		TrackEntity x =trackRepository.save(music);
+		TrackEntity savedMusic =trackRepository.save(music);
 		this.template.convertAndSend("/topic/greetings",musicForFront);
+		
 		return new String("OK");
 	}
-	
 	
 	@RequestMapping(value = "/startRecord")
 	public String sendSound() throws Exception {
@@ -42,6 +72,20 @@ import com.sii.competition.service.musicService;
 		newMusic.setMusic("");
 		TrackEntity x =trackRepository.save(newMusic);
 	    return String.valueOf(x.getId());
+	}
+	
+	@RequestMapping(value = "/getAllMusics")
+	public List<TrackEntity> getAllMusics() throws Exception {
+	    return trackRepository.findAll();
+	}
+	
+	@RequestMapping(value = "/saveMusic")
+	public String saveMusic(TrackEntity json) throws Exception {
+		TrackEntity music = trackRepository.getOne(json.getId());
+		music.setTitle(json.getTitle());
+		music.setDate(new Date());
+		trackRepository.save(music);
+	    return new String("OK");
 	}
 }
 
