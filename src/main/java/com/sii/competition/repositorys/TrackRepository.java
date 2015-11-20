@@ -5,7 +5,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import com.sii.competition.entity.TrackEntity;
 
-@RepositoryRestResource(collectionResourceRel = "people", path = "people")
+@RepositoryRestResource(collectionResourceRel = "music", path = "music")
 public interface TrackRepository extends JpaRepository<TrackEntity, Long> {
 
 
