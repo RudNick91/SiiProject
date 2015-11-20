@@ -1,6 +1,7 @@
 package com.sii.competition.controllers;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -16,7 +17,7 @@ public class webSocketController {
 
     @MessageMapping("/hello")
     @SendTo("/topic/greetings")
-    public  SoundDTO webSocket(SoundDTO message) throws Exception {
+    public  List<SoundDTO> webSocket(List<SoundDTO> message) throws Exception {
         return message;
     }
 
