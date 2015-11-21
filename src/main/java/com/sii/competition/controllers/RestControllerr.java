@@ -104,6 +104,14 @@ import com.sii.competition.service.musicService;
 		trackRepository.save(music);
 	    return new String("OK");
 	}
+	
+	@RequestMapping(value = "/deleteMusic")
+	public String deleteMusic(@RequestBody TrackEntity json) throws Exception {
+		TrackEntity music = trackRepository.getOne(json.getId());
+		trackRepository.delete(music);
+	    return new String("OK");
+	}
+	
 	@RequestMapping(value = "/getWav")
 	public void getWav(HttpServletResponse response, HttpServletRequest request) throws Exception {
 		TrackEntity music = trackRepository.getOne((long) 76);
@@ -111,6 +119,7 @@ import com.sii.competition.service.musicService;
 		musicService.getWav(musicNote, "");
 		
 	}
+	
 	@RequestMapping(value = "/nuty/x1.wav", method = RequestMethod.GET)
 	@ResponseBody
 	public FileSystemResource getFile() {
