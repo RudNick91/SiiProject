@@ -80,12 +80,20 @@ import com.sii.competition.service.musicService;
 	}
 	
 	@RequestMapping(value = "/saveMusic")
-	public String saveMusic(TrackEntity json) throws Exception {
+	public String saveMusic(@RequestBody TrackEntity json) throws Exception {
 		TrackEntity music = trackRepository.getOne(json.getId());
 		music.setTitle(json.getTitle());
 		music.setDate(new Date());
 		trackRepository.save(music);
 	    return new String("OK");
 	}
+	@RequestMapping(value = "/getWav")
+	public String getWav() throws Exception {
+		TrackEntity music = trackRepository.getOne((long) 39);
+		String musicNote = music.getMusic();
+		musicService.getWav(musicNote, "");
+	    return new String("OK");
+	}
+	
 }
 
