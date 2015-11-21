@@ -1,13 +1,23 @@
 package com.sii.competition.controllers;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sii.competition.dto.SoundDTO;
@@ -35,7 +45,6 @@ import com.sii.competition.service.musicService;
 			if(lastTact.indexOf(",")==0){
 				lastTact=lastTact.substring(1, lastTact.length());
 			}
-			
 		}
 
 		if(musicNote.equals("")){
@@ -74,6 +83,14 @@ import com.sii.competition.service.musicService;
 	    return String.valueOf(x.getId());
 	}
 	
+	@RequestMapping(value = "/getRecord")
+	public void getRecord(@RequestBody TrackEntity data) throws Exception {
+		TrackEntity music = trackRepository.getOne(Long.valueOf(data.getId()));
+		String musicNote = music.getMusic();
+		List<SoundDTO> musicForFront= musicService.getMusicForFront(musicNote,String.valueOf(data.getId()));
+		this.template.convertAndSend("/topic/greetings",musicForFront);
+	}
+	
 	@RequestMapping(value = "/getAllMusics")
 	public List<TrackEntity> getAllMusics() throws Exception {
 	    return trackRepository.findAll();
@@ -88,12 +105,16 @@ import com.sii.competition.service.musicService;
 	    return new String("OK");
 	}
 	@RequestMapping(value = "/getWav")
-	public String getWav() throws Exception {
-		TrackEntity music = trackRepository.getOne((long) 39);
+	public void getWav(HttpServletResponse response, HttpServletRequest request) throws Exception {
+		TrackEntity music = trackRepository.getOne((long) 76);
 		String musicNote = music.getMusic();
 		musicService.getWav(musicNote, "");
-	    return new String("OK");
+		
 	}
-	
+	@RequestMapping(value = "/nuty/x1.wav", method = RequestMethod.GET)
+	@ResponseBody
+	public FileSystemResource getFile() {
+	    return new FileSystemResource("nuty/x1.wav"); 
+	}
 }
 
